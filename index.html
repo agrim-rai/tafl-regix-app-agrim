@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regular Expression Toolkit</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Regular Expression Toolkit</h1>
+        <p class="subtitle">Generate strings, visualize parse trees, and verify equivalence</p>
+        <div class="main-grid">
+            <!-- Palette Sidebar -->
+            <div class="panel">
+                <div class="panel-title">Symbol Palette</div>
+                
+                <div class="palette-section">
+                    <div class="palette-section-title">Basic Operators</div>
+                    <div class="palette-grid">
+                        <button class="palette-btn" onclick="insertSymbol('|')">
+                            <span class="symbol">|</span>
+                            <span class="desc">Union (OR)</span>
+                        </button>
+                        <button class="palette-btn" onclick="insertSymbol('*')">
+                            <span class="symbol">*</span>
+                            <span class="desc">Kleene Star</span>
+                        </button>
+                        <button class="palette-btn" onclick="insertSymbol('+')">
+                            <span class="symbol">+</span>
+                            <span class="desc">One or More</span>
+                        </button>
+                        <button class="palette-btn" onclick="insertSymbol('?')">
+                            <span class="symbol">?</span>
+                            <span class="desc">Zero or One</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="palette-section">
+                    <div class="palette-section-title">Grouping</div>
+                    <div class="palette-grid">
+                        <button class="palette-btn" onclick="insertSymbol('()')">
+                            <span class="symbol">( )</span>
+                            <span class="desc">Group</span>
+                        </button>
+                        <button class="palette-btn" onclick="insertSymbol('ε')">
+                            <span class="symbol">ε</span>
+                            <span class="desc">Empty String</span>
+                        </button>
+                        <button class="palette-btn" onclick="insertSymbol('∅')">
+                            <span class="symbol">∅</span>
+                            <span class="desc">Empty Set</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="palette-section">
+                    <div class="palette-section-title">Common Patterns</div>
+                    <div class="palette-grid">
+                        <button class="palette-btn" onclick="insertSymbol('(a|b)')">
+                            <span class="symbol">(a|b)</span>
+                            <span class="desc">a or b</span>
+                        </button>
+                        <button class="palette-btn" onclick="insertSymbol('(a|b)*')">
+                            <span class="symbol">(a|b)*</span>
+                            <span class="desc">Any of a,b</span>
+                        </button>
+                        <button class="palette-btn" onclick="insertSymbol('a*b*')">
+                            <span class="symbol">a*b*</span>
+                            <span class="desc">a's then b's</span>
+                        </button>
+                        <button class="palette-btn" onclick="insertSymbol('(ab)*')">
+                            <span class="symbol">(ab)*</span>
+                            <span class="desc">ab repeated</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="palette-section">
+                    <div class="palette-section-title">Letters</div>
+                    <div class="palette-grid">
+                        <button class="palette-btn" onclick="insertSymbol('a')"><span class="symbol">a</span></button>
+                        <button class="palette-btn" onclick="insertSymbol('b')"><span class="symbol">b</span></button>
+                        <button class="palette-btn" onclick="insertSymbol('c')"><span class="symbol">c</span></button>
+                        <button class="palette-btn" onclick="insertSymbol('0')"><span class="symbol">0</span></button>
+                        <button class="palette-btn" onclick="insertSymbol('1')"><span class="symbol">1</span></button>
+                        <button class="palette-btn" onclick="insertSymbol('2')"><span class="symbol">2</span></button>
+                    </div>
+                </div>
+                <div class="palette-section">
+                    <div class="palette-section-title">Quick Examples</div>
+                    <div class="example-btns">
+                        <button class="example-btn" onclick="loadExample('(a|b)*abb')">ends with abb</button>
+                        <button class="example-btn" onclick="loadExample('a*b*c*')">a*b*c*</button>
+                        <button class="example-btn" onclick="loadExample('(0|1)*00')">ends 00</button>
+                        <button class="example-btn" onclick="loadExample('(a|b)(a|b)*')">non-empty</button>
+                        <button class="example-btn" onclick="loadExample('a?(ba)*')">optional a + ba*</button>
+                        <button class="example-btn" onclick="loadExample('(ab|ba)+')">alternating blocks</button>
+                        <button class="example-btn" onclick="loadExample('(a|ε)b*')">epsilon branch</button>
+                        <button class="example-btn" onclick="loadExample('(a|b|c)*abc')">suffix abc</button>
+                        <button class="example-btn" onclick="loadExample('(01|10)*')">binary pairs</button>
+                        <button class="example-btn" onclick="loadExample('((a|b)c?)+')">nested groups</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Main Content -->
+            <div>
+                <!-- Input Section -->
+                <div class="panel section-panel">
+                    <div class="panel-title">Regular Expression Input</div>
+                    
+                    <div class="info-box">
+                        <strong>Supported Syntax:</strong> 
+                        <code>a-z</code> <code>0-9</code> literals, 
+                        <code>|</code> union, 
+                        <code>*</code> Kleene star, 
+                        <code>+</code> one-or-more, 
+                        <code>?</code> optional, 
+                        <code>()</code> grouping, 
+                        <code>ε</code> empty string,
+                        <code>∅</code> empty set.
+                        Concatenation is implicit.
+                    </div>
+                    <div class="regex-input-wrapper">
+                        <input type="text" id="regexInput" class="regex-input" placeholder="Enter regex, e.g., (a|b)*abb" value="(a|b)*abb">
+                        <button class="generate-btn" onclick="generateStrings()">Generate</button>
+                        <button class="clear-btn" onclick="clearInput()">Clear</button>
+                    </div>
+                    <div class="settings-row">
+                        <div class="setting-group">
+                            <label for="maxLength">Max String Length:</label>
+                            <input type="number" id="maxLength" value="8" min="0" max="15">
+                        </div>
+                        <div class="setting-group">
+                            <label for="maxStrings">Max Strings:</label>
+                            <input type="number" id="maxStrings" value="50" min="1" max="200">
+                        </div>
+                    </div>
+                    <div class="hint-row">tip: press Enter inside an input to run quickly.</div>
+                    <div id="errorDisplay"></div>
+                </div>
+                <!-- Results Section -->
+                <div class="panel section-panel">
+                    <div class="panel-title">Generated Strings & Parse Tree</div>
+                    
+                    <div class="results-grid">
+                        <div>
+                            <h4 class="section-label">Matching Strings</h4>
+                            <div id="stringsList" class="strings-list">
+                                <div class="placeholder-block">
+                                    Click "Generate" to see matching strings
+                                </div>
+                            </div>
+                            <div id="statsDisplay" class="stats"></div>
+                        </div>
+                        <div>
+                            <h4 class="section-label">Parse Tree</h4>
+                            <div id="parseTree" class="parse-tree">
+                                <span class="placeholder-inline">Parse tree will appear here</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Equivalence Section -->
+                <div class="panel equivalence-section">
+                    <div class="panel-title">Equivalence Checker</div>
+                    
+                    <p class="equiv-helper-text">
+                        Test if two regular expressions accept the same language (up to a given string length).
+                    </p>
+                    <div class="equiv-inputs">
+                        <input type="text" id="equivInput1" class="equiv-input" placeholder="First regex" value="(a|b)*">
+                        <span class="vs-badge">≡?</span>
+                        <input type="text" id="equivInput2" class="equiv-input" placeholder="Second regex" value="(a*b*)*">
+                    </div>
+                    <div class="center-row">
+                        <button class="check-equiv-btn" onclick="checkEquivalence()">Check Equivalence</button>
+                    </div>
+                    <div id="equivResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    </body>
+</html>
