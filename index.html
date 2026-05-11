@@ -1,186 +1,559 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Regular Expression Toolkit</title>
 
-    <!-- External CSS -->
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Regular Expression - Agrim Rai</title>
+
     <link rel="stylesheet" href="styles.css">
+
 </head>
+
 <body>
+
     <div class="container">
-        <h1>Regular Expression Toolkit</h1>
-        <p class="subtitle">Generate strings, visualize parse trees, and verify equivalence</p>
+
+        <header class="hero">
+            <h1>Regular Expression Tool</h1>
+            <p class="hero-author"><span class="hero-by">By</span> Agrim Rai · 2024UCD3027 · CSDS</p>
+            <p class="subtitle">Generate strings, visualize parse trees, and verify equivalence.<br>Step through DFA construction, simulate string acceptance, minimize automata, compare languages side by side, and browse formal regex concepts.</p>
+        </header>
+
         <div class="main-grid">
-            <!-- Palette Sidebar -->
+
             <div class="panel">
+
                 <div class="panel-title">Symbol Palette</div>
-                
+
                 <div class="palette-section">
+
                     <div class="palette-section-title">Basic Operators</div>
+
                     <div class="palette-grid">
-                        <button class="palette-btn" onclick="insertSymbol('|')">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('|')">
+
                             <span class="symbol">|</span>
+
                             <span class="desc">Union (OR)</span>
+
                         </button>
-                        <button class="palette-btn" onclick="insertSymbol('*')">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('*')">
+
                             <span class="symbol">*</span>
+
                             <span class="desc">Kleene Star</span>
+
                         </button>
-                        <button class="palette-btn" onclick="insertSymbol('+')">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('+')">
+
                             <span class="symbol">+</span>
+
                             <span class="desc">One or More</span>
+
                         </button>
-                        <button class="palette-btn" onclick="insertSymbol('?')">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('?')">
+
                             <span class="symbol">?</span>
+
                             <span class="desc">Zero or One</span>
+
                         </button>
+
                     </div>
+
                 </div>
+
                 <div class="palette-section">
+
                     <div class="palette-section-title">Grouping</div>
+
                     <div class="palette-grid">
-                        <button class="palette-btn" onclick="insertSymbol('()')">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('()')">
+
                             <span class="symbol">( )</span>
+
                             <span class="desc">Group</span>
+
                         </button>
-                        <button class="palette-btn" onclick="insertSymbol('ε')">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('ε')">
+
                             <span class="symbol">ε</span>
+
                             <span class="desc">Empty String</span>
+
                         </button>
-                        <button class="palette-btn" onclick="insertSymbol('∅')">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('∅')">
+
                             <span class="symbol">∅</span>
+
                             <span class="desc">Empty Set</span>
+
                         </button>
+
                     </div>
+
                 </div>
+
                 <div class="palette-section">
+
                     <div class="palette-section-title">Common Patterns</div>
+
                     <div class="palette-grid">
-                        <button class="palette-btn" onclick="insertSymbol('(a|b)')">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('(a|b)')">
+
                             <span class="symbol">(a|b)</span>
+
                             <span class="desc">a or b</span>
+
                         </button>
-                        <button class="palette-btn" onclick="insertSymbol('(a|b)*')">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('(a|b)*')">
+
                             <span class="symbol">(a|b)*</span>
+
                             <span class="desc">Any of a,b</span>
+
                         </button>
-                        <button class="palette-btn" onclick="insertSymbol('a*b*')">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('a*b*')">
+
                             <span class="symbol">a*b*</span>
+
                             <span class="desc">a's then b's</span>
+
                         </button>
-                        <button class="palette-btn" onclick="insertSymbol('(ab)*')">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('(ab)*')">
+
                             <span class="symbol">(ab)*</span>
+
                             <span class="desc">ab repeated</span>
+
                         </button>
+
                     </div>
-                </div>
-                <div class="palette-section">
-                    <div class="palette-section-title">Letters</div>
+
+                    <div class="palette-section-title palette-section-title--spaced">Advanced patterns</div>
+
                     <div class="palette-grid">
-                        <button class="palette-btn" onclick="insertSymbol('a')"><span class="symbol">a</span></button>
-                        <button class="palette-btn" onclick="insertSymbol('b')"><span class="symbol">b</span></button>
-                        <button class="palette-btn" onclick="insertSymbol('c')"><span class="symbol">c</span></button>
-                        <button class="palette-btn" onclick="insertSymbol('0')"><span class="symbol">0</span></button>
-                        <button class="palette-btn" onclick="insertSymbol('1')"><span class="symbol">1</span></button>
-                        <button class="palette-btn" onclick="insertSymbol('2')"><span class="symbol">2</span></button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('(a|b)*(a|b)(a|b)(a|b)')">
+
+                            <span class="symbol">(a|b)*(a|b)(a|b)(a|b)</span>
+
+                            <span class="desc">Kleene then four letters</span>
+
+                        </button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('((a|b)(a|b))*(a|b)')">
+
+                            <span class="symbol">((a|b)(a|b))*(a|b)</span>
+
+                            <span class="desc">odd length over a,b</span>
+
+                        </button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('(0|1)*(011|101)(0|1)*')">
+
+                            <span class="symbol">(0|1)*(011|101)(0|1)*</span>
+
+                            <span class="desc">binary with 011 or 101 inside</span>
+
+                        </button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('((a|b)*c(a|b)*)+')">
+
+                            <span class="symbol">((a|b)*c(a|b)*)+</span>
+
+                            <span class="desc">one+ blocks each holding a c</span>
+
+                        </button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('(a|ba|bab)*')">
+
+                            <span class="symbol">(a|ba|bab)*</span>
+
+                            <span class="desc">iterate a, ba, or bab</span>
+
+                        </button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('(0|1)*(00|11)(0|1)*')">
+
+                            <span class="symbol">(0|1)*(00|11)(0|1)*</span>
+
+                            <span class="desc">has 00 or 11 substring</span>
+
+                        </button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('(a|b)+(a|b)+(a|b)+')">
+
+                            <span class="symbol">(a|b)+(a|b)+(a|b)+</span>
+
+                            <span class="desc">≥3 letters, each + non-empty</span>
+
+                        </button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('(a|b)*abb(a|b)*')">
+
+                            <span class="symbol">(a|b)*abb(a|b)*</span>
+
+                            <span class="desc">contains abb anywhere</span>
+
+                        </button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('((a|b)c?)+(a|b)?')">
+
+                            <span class="symbol">((a|b)c?)+(a|b)?</span>
+
+                            <span class="desc">c-optional chunks + tail</span>
+
+                        </button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('(a|b)*a(a|b)ba')">
+
+                            <span class="symbol">(a|b)*a(a|b)ba</span>
+
+                            <span class="desc">suffix a, any, then ba</span>
+
+                        </button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('(0|1)*(010|1010)(0|1)*')">
+
+                            <span class="symbol">(0|1)*(010|1010)(0|1)*</span>
+
+                            <span class="desc">contains 010 or 1010</span>
+
+                        </button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('((a|b)|c(d|e))*(a|b)')">
+
+                            <span class="symbol">((a|b)|c(d|e))*(a|b)</span>
+
+                            <span class="desc">nested alts with c(d|e) loop</span>
+
+                        </button>
+
                     </div>
+
                 </div>
+
                 <div class="palette-section">
+
+                    <div class="palette-section-title">Letters</div>
+
+                    <div class="palette-grid">
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('a')"><span class="symbol">a</span></button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('b')"><span class="symbol">b</span></button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('c')"><span class="symbol">c</span></button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('0')"><span class="symbol">0</span></button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('1')"><span class="symbol">1</span></button>
+
+                        <button type="button" class="palette-btn" onclick="insertSymbol('2')"><span class="symbol">2</span></button>
+
+                    </div>
+
+                </div>
+
+                <div class="palette-section">
+
                     <div class="palette-section-title">Quick Examples</div>
+
                     <div class="example-btns">
-                        <button class="example-btn" onclick="loadExample('(a|b)*abb')">ends with abb</button>
-                        <button class="example-btn" onclick="loadExample('a*b*c*')">a*b*c*</button>
-                        <button class="example-btn" onclick="loadExample('(0|1)*00')">ends 00</button>
-                        <button class="example-btn" onclick="loadExample('(a|b)(a|b)*')">non-empty</button>
-                        <button class="example-btn" onclick="loadExample('a?(ba)*')">optional a + ba*</button>
-                        <button class="example-btn" onclick="loadExample('(ab|ba)+')">alternating blocks</button>
-                        <button class="example-btn" onclick="loadExample('(a|ε)b*')">epsilon branch</button>
-                        <button class="example-btn" onclick="loadExample('(a|b|c)*abc')">suffix abc</button>
-                        <button class="example-btn" onclick="loadExample('(01|10)*')">binary pairs</button>
-                        <button class="example-btn" onclick="loadExample('((a|b)c?)+')">nested groups</button>
+
+                        <button type="button" class="example-btn" onclick="loadExample('(a|b)*abb')">ends with abb</button>
+
+                        <button type="button" class="example-btn" onclick="loadExample('a*b*c*')">a*b*c*</button>
+
+                        <button type="button" class="example-btn" onclick="loadExample('(0|1)*00')">ends 00</button>
+
+                        <button type="button" class="example-btn" onclick="loadExample('(a|b)(a|b)*')">non-empty</button>
+
+                        <button type="button" class="example-btn" onclick="loadExample('a?(ba)*')">optional a + ba*</button>
+
+                        <button type="button" class="example-btn" onclick="loadExample('(ab|ba)+')">alternating blocks</button>
+
+                        <button type="button" class="example-btn" onclick="loadExample('(a|ε)b*')">epsilon branch</button>
+
+                        <button type="button" class="example-btn" onclick="loadExample('(a|b|c)*abc')">suffix abc</button>
+
+                        <button type="button" class="example-btn" onclick="loadExample('(01|10)*')">binary pairs</button>
+
+                        <button type="button" class="example-btn" onclick="loadExample('((a|b)c?)+')">nested groups</button>
+
                     </div>
+
                 </div>
+
             </div>
-            <!-- Main Content -->
-            <div>
-                <!-- Input Section -->
+
+            <div class="main-stack">
+
                 <div class="panel section-panel">
+
                     <div class="panel-title">Regular Expression Input</div>
-                    
+
                     <div class="info-box">
-                        <strong>Supported Syntax:</strong> 
-                        <code>a-z</code> <code>0-9</code> literals, 
-                        <code>|</code> union, 
-                        <code>*</code> Kleene star, 
-                        <code>+</code> one-or-more, 
-                        <code>?</code> optional, 
-                        <code>()</code> grouping, 
+
+                        <strong>Supported Syntax:</strong>
+
+                        <code>a-z</code> <code>0-9</code> literals,
+
+                        <code>|</code> union,
+
+                        <code>*</code> Kleene star,
+
+                        <code>+</code> one-or-more,
+
+                        <code>?</code> optional,
+
+                        <code>()</code> grouping,
+
                         <code>ε</code> empty string,
+
                         <code>∅</code> empty set.
-                        Concatenation is implicit.
+
+                        Concatenation is implicit. DFA animation uses the same expression (internally compiled to Thompson + subset construction).
+
                     </div>
+
                     <div class="regex-input-wrapper">
+
                         <input type="text" id="regexInput" class="regex-input" placeholder="Enter regex, e.g., (a|b)*abb" value="(a|b)*abb">
-                        <button class="generate-btn" onclick="generateStrings()">Generate</button>
-                        <button class="clear-btn" onclick="clearInput()">Clear</button>
+
+                        <button type="button" class="generate-btn" onclick="generateStrings()">Generate</button>
+
+                        <button type="button" class="clear-btn" onclick="clearInput()">Clear</button>
+
                     </div>
+
                     <div class="settings-row">
+
                         <div class="setting-group">
+
                             <label for="maxLength">Max String Length:</label>
+
                             <input type="number" id="maxLength" value="8" min="0" max="15">
+
                         </div>
+
                         <div class="setting-group">
+
                             <label for="maxStrings">Max Strings:</label>
+
                             <input type="number" id="maxStrings" value="50" min="1" max="200">
+
                         </div>
+
                     </div>
-                    <div class="hint-row">tip: press Enter inside an input to run quickly.</div>
+
+                    <div class="hint-row">tip: press Enter inside an input to run quickly. Use tabs below for string output, DFA construction, or equivalence.</div>
+
                     <div id="errorDisplay"></div>
+
                 </div>
-                <!-- Results Section -->
-                <div class="panel section-panel">
-                    <div class="panel-title">Generated Strings & Parse Tree</div>
-                    
-                    <div class="results-grid">
-                        <div>
-                            <h4 class="section-label">Matching Strings</h4>
-                            <div id="stringsList" class="strings-list">
-                                <div class="placeholder-block">
-                                    Click "Generate" to see matching strings
+
+
+
+                <nav class="app-tabs" role="tablist" aria-label="Toolkit sections">
+
+                    <button type="button" class="app-tab active" role="tab" data-tab="generate" aria-selected="true">Strings &amp; parse tree</button>
+
+                    <button type="button" class="app-tab" role="tab" data-tab="dfa" aria-selected="false">DFA construction</button>
+
+                    <button type="button" class="app-tab" role="tab" data-tab="equiv" aria-selected="false">Equivalence</button>
+
+                </nav>
+
+
+
+                <div id="tab-pane-generate" class="tab-panel active" role="tabpanel">
+
+                    <div class="panel section-panel">
+
+                        <div class="panel-title">Generated Strings &amp; Parse Tree</div>
+
+                        <div class="results-grid">
+
+                            <div>
+
+                                <h4 class="section-label">Matching Strings</h4>
+
+                                <div id="stringsList" class="strings-list">
+
+                                    <div class="placeholder-block">Click &quot;Generate&quot; to see matching strings</div>
+
                                 </div>
+
+                                <div id="statsDisplay" class="stats"></div>
+
                             </div>
-                            <div id="statsDisplay" class="stats"></div>
+
+                            <div>
+
+                                <h4 class="section-label">Parse Tree</h4>
+
+                                <div id="parseTree" class="parse-tree">
+
+                                    <span class="placeholder-inline">Parse tree will appear here</span>
+
+                                </div>
+
+                            </div>
+
                         </div>
-                        <div>
-                            <h4 class="section-label">Parse Tree</h4>
-                            <div id="parseTree" class="parse-tree">
-                                <span class="placeholder-inline">Parse tree will appear here</span>
+
+                    </div>
+
+                </div>
+
+
+
+                <div id="tab-pane-dfa" class="tab-panel" role="tabpanel">
+
+                    <div class="panel section-panel">
+
+                        <div class="panel-title">Step-by-step DFA (subset construction)</div>
+
+                        <p class="equiv-helper-text">Build from the main regex above. Control playback speed, step manually, or minimize the DFA when construction finishes.</p>
+
+                        <div class="viz-toolbar">
+
+                            <button type="button" id="dfaBuildBtn" class="generate-btn">Build &amp; animate</button>
+
+                            <button type="button" id="dfaMinimizeBtn" class="check-equiv-btn" style="display:none;">Minimize DFA</button>
+
+                            <span class="viz-toolbar-label">Speed</span>
+
+                            <input type="range" id="dfaSpeedSlider" min="100" max="2000" value="900" title="Animation interval">
+
+                            <button type="button" id="dfaStepPrev" class="icon-btn" disabled aria-label="Previous step">⏮</button>
+
+                            <button type="button" id="dfaPlayPause" class="icon-btn primary-icon-btn" aria-label="Play or pause">▶</button>
+
+                            <button type="button" id="dfaStepNext" class="icon-btn" disabled aria-label="Next step">⏭</button>
+
+                        </div>
+
+                        <div id="dfaVizError" class="dfa-viz-error" style="display:none;"></div>
+
+                        <div class="canvas-wrap">
+
+                            <canvas id="dfaCanvas" width="780" height="360"></canvas>
+
+                        </div>
+
+                        <div id="dfaStepDescription" class="step-info">Build a DFA to see construction steps.</div>
+
+                        <div id="dfaStepLogPanel" class="dfa-step-log-panel" style="display:none;">
+                            <button type="button" id="dfaLogToggle" class="dfa-log-toggle" aria-expanded="false">
+                                <span id="dfaLogToggleText">Expand construction log</span>
+                                <span id="dfaLogCount" class="dfa-log-count"></span>
+                            </button>
+                            <div id="dfaLogCollapsedSummary" class="dfa-log-collapsed-summary" aria-live="polite"></div>
+                            <div id="dfaStepLogExpanded" class="dfa-step-log-expanded" hidden>
+                                <ol id="dfaStepLogList" class="dfa-step-log-list" start="1"></ol>
                             </div>
                         </div>
+
                     </div>
+
                 </div>
-                <!-- Equivalence Section -->
-                <div class="panel equivalence-section">
-                    <div class="panel-title">Equivalence Checker</div>
-                    
-                    <p class="equiv-helper-text">
-                        Test if two regular expressions accept the same language (up to a given string length).
-                    </p>
-                    <div class="equiv-inputs">
-                        <input type="text" id="equivInput1" class="equiv-input" placeholder="First regex" value="(a|b)*">
-                        <span class="vs-badge">≡?</span>
-                        <input type="text" id="equivInput2" class="equiv-input" placeholder="Second regex" value="(a*b*)*">
+
+
+
+                <div id="tab-pane-equiv" class="tab-panel" role="tabpanel">
+
+                    <div class="panel equivalence-section">
+
+                        <div class="panel-title">Equivalence Checker</div>
+
+                        <p class="equiv-helper-text">
+
+                            Compare two regexes using minimized DFAs (exact same language). Final graphs are shown side by side. A bounded string sample (from max length above) is listed as a quick sanity check.
+
+                        </p>
+
+                        <div class="equiv-inputs">
+
+                            <input type="text" id="equivInput1" class="equiv-input" placeholder="(a|b)*(a|b)*abb" value="(a|b)*(a|b)*abb">
+
+                            <span class="vs-badge">≡?</span>
+
+                            <input type="text" id="equivInput2" class="equiv-input" placeholder="(a|b)*abb" value="(a|b)*abb">
+
+                        </div>
+
+                        <div class="center-row">
+
+                            <button type="button" class="check-equiv-btn" onclick="checkEquivalence()">Check equivalence</button>
+
+                        </div>
+
+                        <div id="equivResult"></div>
+
+                        <div id="equivDualWrap" class="equiv-dual-wrap" style="display:none;">
+
+                            <div class="equiv-canvas-card">
+
+                                <h3 class="equiv-canvas-title">DFA — first regex</h3>
+
+                                <div class="canvas-wrap canvas-wrap--sm">
+
+                                    <canvas id="equivCanvas1" width="360" height="280"></canvas>
+
+                                </div>
+
+                            </div>
+
+                            <div class="equiv-canvas-card">
+
+                                <h3 class="equiv-canvas-title">DFA — second regex</h3>
+
+                                <div class="canvas-wrap canvas-wrap--sm">
+
+                                    <canvas id="equivCanvas2" width="360" height="280"></canvas>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
                     </div>
-                    <div class="center-row">
-                        <button class="check-equiv-btn" onclick="checkEquivalence()">Check Equivalence</button>
-                    </div>
-                    <div id="equivResult"></div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
+    <script src="TAFL_Project/regex.js"></script>
+
+    <script src="TAFL_Project/visualizer.js"></script>
+
     <script src="script.js"></script>
-    </body>
+
+</body>
+
 </html>
+
