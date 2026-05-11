@@ -34,6 +34,21 @@ class RegexEngine {
         this.dfaSteps = [];
     }
 
+    // detach NFA so a later compile() reset() cannot mutate returned states
+    cloneStatesMap(statesMap) {
+        const copy = new Map();
+        for (const [id, state] of statesMap) {
+            const s = new State(id);
+            s.isEnd = !!state.isEnd;
+            for (const ch in state.transitions) {
+                const arr = state.transitions[ch];
+                s.transitions[ch] = Array.isArray(arr) ? arr.slice() : arr;
+            }
+            copy.set(id, s);
+        }
+        return copy;
+    }
+
     newState() {
         const id = this.stateCounter++;
         const state = new State(id);
@@ -254,6 +269,7 @@ class RegexEngine {
             }
             return {
                 ...nfa,
+                states: this.cloneStatesMap(nfa.states),
                 dfaSteps: this.dfaSteps,
                 lastDfa: dfa
             };
