@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theory — Regular Expressions &amp; Automata</title>
+    <link rel="icon" type="image/jpeg" href="png.jpg">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="theory.css">
+</head>
+<body class="theory-page">
+    <a class="theory-back" href="index.html">← Back to app</a>
+
+    <div class="container">
+        <div class="theory-shell">
+            <aside class="theory-toc" aria-label="Table of contents">
+                <h2>Contents</h2>
+                <nav>
+                    <ul>
+                        <li><a href="#languages">Languages &amp; alphabets</a></li>
+                        <li><a href="#regex">Regular expressions</a></li>
+                        <li><a href="#algebra">Algebraic laws</a></li>
+                        <li><a href="#parse-trees">Parse trees</a></li>
+                        <li><a href="#nfa-dfa">Regex → NFA → DFA</a></li>
+                        <li><a href="#nfa-formal">NFA (formal)</a></li>
+                        <li><a href="#subset">Subset construction</a></li>
+                        <li><a href="#dfa-def">DFA definition</a></li>
+                        <li><a href="#simulation">Simulation &amp; δ̂</a></li>
+                        <li><a href="#minimize">Minimization</a></li>
+                        <li><a href="#myhill">Myhill–Nerode</a></li>
+                        <li><a href="#equiv">Equivalence</a></li>
+                        <li><a href="#limits">Beyond regular</a></li>
+                        <li><a href="#practice">Practice &amp; tips</a></li>
+                    </ul>
+                </nav>
+                <a class="theory-cta" href="index.html">Try the app</a>
+            </aside>
+
+            <main class="theory-main">
+                <header>
+                    <h1>Theory &amp; formal foundations</h1>
+                    <p class="theory-lead">
+                        Companion notes for the Regular Expression Tool: languages, syntax trees, automata, minimization, and exact equivalence.
+                        Sections build from notation to algorithms you see animated in the app.
+                    </p>
+                </header>
+
+                <section id="languages" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>Languages &amp; alphabets</h2>
+                        <span class="theory-badge">Sets of strings</span>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Basic vocabulary</h3>
+                        <ul>
+                            <li>An <strong>alphabet</strong> Σ is a finite, non-empty set of symbols (e.g. Σ = <code class="theory-code">{a, b}</code>).</li>
+                            <li>A <strong>string</strong> (or word) is a finite sequence of symbols from Σ, including the <strong>empty string</strong> ε of length 0.</li>
+                            <li>Σ<sup>*</sup> is the set of <em>all</em> finite strings over Σ, including ε.</li>
+                            <li>A <strong>language</strong> L is any subset L ⊆ Σ<sup>*</sup>. It may be finite, infinite, empty ∅, or {ε}.</li>
+                        </ul>
+                        <p>
+                            A <strong>regular language</strong> is any language that can be built from ∅, {ε}, and single-symbol languages using union, concatenation, and Kleene star finitely many times.
+                            Every regular language is accepted by some finite automaton; that is the deep fact behind regex engines.
+                        </p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Operations on languages</h3>
+                        <p>For L<sub>1</sub>, L<sub>2</sub> ⊆ Σ<sup>*</sup>:</p>
+                        <ul>
+                            <li><strong>Union:</strong> L<sub>1</sub> ∪ L<sub>2</sub> = { w | w ∈ L<sub>1</sub> or w ∈ L<sub>2</sub> } — matches the <code class="theory-code">|</code> operator when L<sub>1</sub>, L<sub>2</sub> are the languages of sub-expressions.</li>
+                            <li><strong>Concatenation:</strong> L<sub>1</sub>L<sub>2</sub> = { xy | x ∈ L<sub>1</sub>, y ∈ L<sub>2</sub> } — matches implicit or explicit concatenation in a regex.</li>
+                            <li><strong>Kleene star:</strong> L<sup>*</sup> = { ε } ∪ L ∪ LL ∪ LLL ∪ … — zero or more concatenated pieces from L.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="regex" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>Regular expressions</h2>
+                        <span class="theory-badge">Syntax → language</span>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Inductive reading (how theorists define them)</h3>
+                        <p>Over a fixed alphabet Σ, each regex r denotes a language L(r). Typical base and inductive clauses:</p>
+                        <ul>
+                            <li>∅ denotes ∅; ε denotes {ε}; for a ∈ Σ, <code class="theory-code">a</code> denotes {a}.</li>
+                            <li>If r<sub>1</sub>, r<sub>2</sub> are regexes, r<sub>1</sub>|r<sub>2</sub> denotes L(r<sub>1</sub>) ∪ L(r<sub>2</sub>).</li>
+                            <li>r<sub>1</sub>r<sub>2</sub> (concatenation) denotes L(r<sub>1</sub>)L(r<sub>2</sub>).</li>
+                            <li>r<sup>*</sup> denotes L(r)<sup>*</sup>.</li>
+                        </ul>
+                        <p>Your app adds shorthands <code class="theory-code">+</code> and <code class="theory-code">?</code>; they expand to combinations of union, concat, and star (e.g. r+ ≡ rr<sup>*</sup>, r? ≡ r|ε at the language level).</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Operators in this project</h3>
+                        <ul>
+                            <li><code class="theory-code">|</code> — union of two sub-expressions.</li>
+                            <li><code class="theory-code">*</code> — star binds to the shortest legal atom on its left (literal or parenthesized group).</li>
+                            <li><code class="theory-code">+</code> — one or more repetitions of the underlying language.</li>
+                            <li><code class="theory-code">?</code> — optional (zero or one).</li>
+                            <li><code class="theory-code">()</code> — grouping for both semantics and readability.</li>
+                            <li>Implicit <strong>concatenation</strong> is inserted between atoms where the grammar requires it (same role as an explicit “·” in formal writing).</li>
+                        </ul>
+                    </div>
+                    <div class="theory-details">
+                        <summary>Precedence, associativity, and pitfalls</summary>
+                        <div class="theory-details-body">
+                            <ul>
+                                <li>Star, plus, and question mark bind tightly; union usually binds looser than concatenation — so <code class="theory-code">ab|cd</code> is (ab)|(cd), not a(b|c)d unless you parenthesize.</li>
+                                <li>Union is associative; concatenation is associative at the <em>language</em> level (string grouping differs only by how you parenthesize the same underlying word).</li>
+                                <li>Two regex <strong>texts</strong> can differ while L(r<sub>1</sub>) = L(r<sub>2</sub>); equivalence in the app checks language equality via automata, not string equality of patterns.</li>
+                                <li>Whitespace in this tool is literal if present inside the pattern; there is no “free” whitespace ignore unless you treat space as a symbol in Σ.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="algebra" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>Algebraic laws (intuition)</h2>
+                        <span class="theory-badge">Same language</span>
+                    </div>
+                    <div class="theory-card">
+                        <p>These identities hold for <em>languages</em> of regexes (over the same alphabet). They explain many “obvious” simplifications.</p>
+                        <ul>
+                            <li><strong>Idempotent union:</strong> L ∪ L = L; in regex text, r|r accepts the same strings as r.</li>
+                            <li><strong>Star absorption:</strong> L<sup>*</sup>L<sup>*</sup> = L<sup>*</sup> when L already allows arbitrary repetition — e.g. <code class="theory-code">(a|b)*(a|b)*</code> and <code class="theory-code">(a|b)*</code>.</li>
+                            <li><strong>Annihilator:</strong> ∅L = L∅ = ∅; no string can be built if one side is impossible.</li>
+                            <li><strong>Identity for concat:</strong> {ε}L = L{ε} = L.</li>
+                            <li><strong>Distributivity hints:</strong> L(L<sub>1</sub> ∪ L<sub>2</sub>) = LL<sub>1</sub> ∪ LL<sub>2</sub>; (L<sub>1</sub> ∪ L<sub>2</sub>)L = L<sub>1</sub>L ∪ L<sub>2</sub>L.</li>
+                        </ul>
+                        <div class="theory-callout">
+                            Algebraic laws explain quick sanity checks; they do not replace a formal proof for every pair of expressions — the product-automaton test in the app is decisive for the compiled DFAs.
+                        </div>
+                    </div>
+                </section>
+
+                <section id="parse-trees" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>Parse trees</h2>
+                        <span class="theory-badge">Syntax</span>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Role of the tree</h3>
+                        <p>
+                            A <strong>parse tree</strong> records how the parser grouped your input: leaves are literals or ε; internal nodes are operators (union, concat, star, etc.).
+                            The tree removes ambiguity about “what the star covers” and “which operands the union combines.”
+                        </p>
+                        <ul>
+                            <li>Every valid regex in the grammar corresponds to at least one tree; parenthesization fixes the shape when the grammar would otherwise be ambiguous.</li>
+                            <li>A <strong>post-order traversal</strong> yields postfix notation — the same order a stack-based Thompson builder consumes.</li>
+                            <li>The tree view in the app is a concrete printout of that structure; mismatches between what you meant and what you wrote usually show up as unexpected tree shape before you even look at the DFA.</li>
+                        </ul>
+                    </div>
+                    <div class="theory-card">
+                        <h3>From tree to automaton fragments</h3>
+                        <ul>
+                            <li>Each subtree corresponds to a sub-NFA with a distinguished start and accept “port.”</li>
+                            <li>Internal nodes combine children using ε-transitions (Thompson’s recipe).</li>
+                            <li>Because combinations are local, the overall NFA size is linear in the size of the regex for standard constructions.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="nfa-dfa" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>Regex → NFA → DFA (pipeline)</h2>
+                        <span class="theory-badge">This app</span>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Thompson’s construction (sketch)</h3>
+                        <ul>
+                            <li><strong>Literal:</strong> one transition on that symbol between fresh start and accept states.</li>
+                            <li><strong>Concatenation:</strong> ε from first fragment’s accept to second fragment’s start; new fragment spans first start to second accept.</li>
+                            <li><strong>Union:</strong> new start with ε to both sub-starts; both sub-accepts ε-merge into a new accept.</li>
+                            <li><strong>Star:</strong> new start with ε to sub-start and directly to new accept; sub-accept ε-loops back to sub-start and ε-goes to new accept.</li>
+                        </ul>
+                        <p>The NFA may have many ε-edges and, for some symbols, multiple transitions from a state — that is why it is “nondeterministic.”</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Why go to a DFA?</h3>
+                        <ul>
+                            <li>Simulation on an NFA without conversion can require tracking a <em>set</em> of states anyway (powerset thinking).</li>
+                            <li>A complete DFA gives exactly one successor per (state, symbol) — easy stepping and visualization.</li>
+                            <li>Subset construction makes that set-tracking explicit as DFA states.</li>
+                        </ul>
+                    </div>
+                    <div class="theory-formula">
+                        <span class="mono">|Q<sub>DFA</sub>| ≤ 2<sup>|Q<sub>NFA</sub>|</sup></span>
+                        <p class="theory-formula-note">Exponential worst case; many subsets are unreachable so the built graph is often much smaller.</p>
+                    </div>
+                </section>
+
+                <section id="nfa-formal" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>NFA (formal)</h2>
+                        <span class="theory-badge">Nondeterminism</span>
+                    </div>
+                    <div class="theory-formula">
+                        <span class="mono">N = (Q, Σ, δ, q<sub>0</sub>, F)</span>
+                        <ul>
+                            <li>δ : Q × (Σ ∪ {ε}) → P(Q) — image is a <em>set</em> of possible next states (P(Q) is the power set).</li>
+                            <li>Acceptance: some computation path reads the whole input and ends in F (including any ε-moves between symbols).</li>
+                        </ul>
+                    </div>
+                    <div class="theory-card">
+                        <h3>ε-closure (algorithmic)</h3>
+                        <p>Given a set S ⊆ Q of NFA states:</p>
+                        <ul>
+                            <li>Initialize closure ← S and a stack with all states in S.</li>
+                            <li>While stack nonempty: pop state q; for each q′ reachable from q by a single ε-edge, if q′ ∉ closure, add q′ and push q′.</li>
+                            <li>The result is the ε-closure of S — all states reachable without consuming an input symbol.</li>
+                        </ul>
+                        <p>Subset construction uses ε-closure after every symbol move so each DFA state encodes “where the NFA could be, including silent jumps.”</p>
+                    </div>
+                </section>
+
+                <section id="subset" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>Subset construction (NFA → DFA)</h2>
+                        <span class="theory-badge">Algorithm</span>
+                    </div>
+                    <div class="theory-card">
+                        <h3>State space</h3>
+                        <p>Each DFA state is a subset T ⊆ Q of NFA states (often written [T] in lectures). The start DFA state is ε-closure({q<sub>0</sub>}).</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Transition rule</h3>
+                        <p>For DFA state T and symbol a ∈ Σ:</p>
+                        <ul>
+                            <li>Let U = ⋃<sub>q ∈ T</sub> δ(q, a) (all NFA targets on a from states in T).</li>
+                            <li>Define δ<sub>DFA</sub>(T, a) = ε-closure(U).</li>
+                            <li>If U is empty, the move is undefined unless you add an explicit <strong>sink</strong> (dead) state; the app’s visualization follows the partial graph from reachable subsets.</li>
+                        </ul>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Accepting condition</h3>
+                        <p>A subset state T is accepting for the pattern if T ∩ F ≠ ∅ — at least one NFA accept state is “currently possible.”</p>
+                        <p>Worklist view: start with the start subset; repeatedly pick an unprocessed (T, a), compute δ<sub>DFA</sub>(T, a), enqueue if new — exactly the BFS you see logged during construction.</p>
+                    </div>
+                </section>
+
+                <section id="dfa-def" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>DFA definition</h2>
+                        <span class="theory-badge">5-tuple</span>
+                    </div>
+                    <div class="theory-card">
+                        <p>
+                            A <strong>deterministic finite automaton</strong> has at most one next state per current state and input symbol (total DFAs include a sink so δ is total).
+                            It accepts w if the unique run on w ends in F.
+                        </p>
+                    </div>
+                    <div class="theory-formula">
+                        <span class="mono">M = (Q, Σ, δ, q<sub>0</sub>, F)</span>
+                        <ul>
+                            <li><strong>Q</strong> — finite states.</li>
+                            <li><strong>Σ</strong> — finite alphabet.</li>
+                            <li><strong>δ : Q × Σ → Q</strong> — transition function (partial δ corresponds to “crash” or implicit reject).</li>
+                            <li><strong>q<sub>0</sub></strong> — start.</li>
+                            <li><strong>F ⊆ Q</strong> — accept states.</li>
+                        </ul>
+                    </div>
+                    <div class="theory-grid2">
+                        <div class="theory-mini">
+                            <h4>States (Q)</h4>
+                            <p>Summary of progress through the pattern; each state encodes a distinguishable “memory” of the input prefix.</p>
+                        </div>
+                        <div class="theory-mini">
+                            <h4>Alphabet (Σ)</h4>
+                            <p>Symbols read one per step; multi-character “tokens” are not built in unless you model them as single symbols.</p>
+                        </div>
+                        <div class="theory-mini">
+                            <h4>δ</h4>
+                            <p>Deterministic step: at most one successor per (q, a). Visual graphs draw one labeled edge per symbol out of each state.</p>
+                        </div>
+                        <div class="theory-mini">
+                            <h4>q<sub>0</sub> and F</h4>
+                            <p>Start before reading; accept after consuming the entire string (no trailing input left).</p>
+                        </div>
+                        <div class="theory-mini theory-mini--full">
+                            <h4>Language L(M)</h4>
+                            <p>L(M) = { w ∈ Σ<sup>*</sup> | δ̂(q<sub>0</sub>, w) ∈ F } using the extended transition δ̂ defined below.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="simulation" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>Simulation &amp; extended δ̂</h2>
+                        <span class="theory-badge">Running M</span>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Extended transition δ̂</h3>
+                        <p>Define δ̂(q, ε) = q, and inductively δ̂(q, wa) = δ(δ̂(q, w), a) when the right-hand δ is defined.</p>
+                        <ul>
+                            <li>String w is <strong>accepted</strong> iff δ̂(q<sub>0</sub>, w) ∈ F.</li>
+                            <li>If some prefix leaves δ undefined, the machine rejects w (or you treat missing edges as transitions to a sink reject state).</li>
+                            <li>The DFA tab’s stepper implements this walk — each click applies one symbol.</li>
+                        </ul>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Time per input</h3>
+                        <p>On a fixed DFA, testing a string of length n takes O(n) time and O(1) space beyond the input — one of the reasons compilers and matchers like DFAs after preprocessing the pattern.</p>
+                    </div>
+                </section>
+
+                <section id="minimize" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>DFA minimization</h2>
+                        <span class="theory-badge">Partitions</span>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Goal</h3>
+                        <p>Merge states that are <strong>indistinguishable</strong>: for every continuation w ∈ Σ<sup>*</sup>, both states agree on accept/reject. The quotient machine has one state per equivalence class.</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Partition refinement (Moore-style)</h3>
+                        <ul>
+                            <li>Start with partition {F, Q \ F} (accept vs non-accept), refined so the start’s block is convenient for display.</li>
+                            <li>Refine: split a block if two states inside it disagree on which block δ sends them to for some symbol a ∈ Σ.</li>
+                            <li>Repeat until no split happens — blocks are the minimal states.</li>
+                            <li>Transitions between blocks are well-defined because all states in a block agree on each symbol’s target block.</li>
+                        </ul>
+                        <p>This matches the high-level behavior of the minimizer in the project (split by signature of “which block each symbol reaches”).</p>
+                    </div>
+                    <div class="theory-details">
+                        <summary>Table-filling (alternative view)</summary>
+                        <div class="theory-details-body">
+                            <ul>
+                                <li>Mark every (p, q) where p ∈ F and q ∉ F (or symmetrically) as distinguishable.</li>
+                                <li>Repeat: if some unmarked pair (p, q) has a symbol a such that (δ(p,a), δ(q,a)) is marked, mark (p, q).</li>
+                                <li>Stop when a full pass adds no marks; unmarked pairs are mergeable.</li>
+                                <li>Same equivalence relation as partition refinement — two algorithms, one concept.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="theory-callout">
+                        For a <strong>complete</strong> DFA over Σ, the minimal DFA is unique up to isomorphism (renaming states). That uniqueness is why comparing minimized machines is a standard exact test for language equality.
+                    </div>
+                </section>
+
+                <section id="myhill" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>Myhill–Nerode (conceptual backbone)</h2>
+                        <span class="theory-badge">Equivalence classes</span>
+                    </div>
+                    <div class="theory-card">
+                        <p>Define x ~<sub>L</sub> y iff ∀w ∈ Σ<sup>*</sup>, (xw ∈ L ⇔ yw ∈ L). Classes of ~<sub>L</sub> are the coarsest memory any DFA for L must keep.</p>
+                        <ul>
+                            <li>L is regular iff ~<sub>L</sub> has <strong>finite</strong> index (finitely many classes).</li>
+                            <li>The number of classes equals the number of states in the <strong>unique</strong> minimal complete DFA for L.</li>
+                            <li>Minimization finds those classes algorithmically without naming ~<sub>L</sub> explicitly.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="equiv" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>Language equivalence of two DFAs</h2>
+                        <span class="theory-badge">Product</span>
+                    </div>
+                    <div class="theory-card">
+                        <p>Given M<sub>1</sub>, M<sub>2</sub> (complete over the same Σ for simplicity), L(M<sub>1</sub>) = L(M<sub>2</sub>) iff no reachable pair (q<sub>1</sub>, q<sub>2</sub>) splits acceptance.</p>
+                        <ul>
+                            <li><strong>Initialize</strong> queue with (q<sub>0,1</sub>, q<sub>0,2</sub>) and a visited set of pairs.</li>
+                            <li><strong>Step:</strong> dequeue (p, r). If (p ∈ F<sub>1</sub>) XOR (r ∈ F<sub>2</sub>), return “different languages.”</li>
+                            <li>For each a ∈ Σ, enqueue (δ<sub>1</sub>(p,a), δ<sub>2</sub>(r,a)) if not visited.</li>
+                            <li>If queue empties without mismatch, languages are equal.</li>
+                        </ul>
+                        <p>This is BFS/DFS on the <strong>product graph</strong>; it checks language equality, not graph isomorphism and not equality of state IDs.</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Bounded sampling in the app</h3>
+                        <p>The equivalence tab also compares finite samples of generated strings up to a chosen length. That is a <strong>sanity check</strong>: useful when both languages are finite at that bound, but not a proof for all n. Trust the DFA-level product result for an exact answer after compilation.</p>
+                    </div>
+                </section>
+
+                <section id="limits" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>Beyond regular languages</h2>
+                        <span class="theory-badge">Context</span>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Pumping lemma (orientation only)</h3>
+                        <p>If L is regular, there exists p ≥ 1 such that any z ∈ L with |z| ≥ p splits as z = uvw with |uv| ≤ p, |v| ≥ 1, and ∀i ≥ 0, uv<sup>i</sup>w ∈ L. The contrapositive proves some languages are <strong>not</strong> regular (e.g. { a<sup>n</sup>b<sup>n</sup> | n ≥ 0 }).</p>
+                        <p>This tool intentionally stays in the regular fragment; nested unbounded counting typically needs richer models (pushdown / CFG, etc.).</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Closure reminders</h3>
+                        <ul>
+                            <li>Regular languages are closed under ∪, ∩, complement, concat, and star.</li>
+                            <li>Intersection corresponds to product construction; complement swaps accept/non-accept on a <strong>complete</strong> DFA.</li>
+                            <li>Closure facts justify building complex matchers from smaller ones — the same algebra underlies regex combination libraries.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="practice" class="theory-section">
+                    <div class="theory-section-head">
+                        <h2>Practice &amp; tips</h2>
+                        <span class="theory-badge">This project</span>
+                    </div>
+                    <div class="theory-card">
+                        <ul>
+                            <li>Build small patterns first (<code class="theory-code">(a|b)</code>, <code class="theory-code">a*</code>, <code class="theory-code">ab|ba</code>) and read the parse tree before opening the DFA tab.</li>
+                            <li>Step through subset construction logs: each new DFA state label corresponds to a set of NFA node ids — map that back to the NFA theory above.</li>
+                            <li>After minimization, count states and compare to hand-drawn minimal machines for classic exercises (e.g. ends-with patterns).</li>
+                            <li>For equivalence, test pairs that are equal “by algebra” but look different textually; the minimized graphs should match up to layout.</li>
+                            <li>If product check disagrees with your intuition, re-check parentheses, star scope, and whether both sides use the same alphabet of literals.</li>
+                        </ul>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

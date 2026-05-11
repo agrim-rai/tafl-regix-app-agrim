@@ -715,11 +715,53 @@
             });
         }
 
+        function initTheoryPromo() {
+            var lsKey = 'taflTheoryPromoDismissed';
+            var ssKey = 'taflTheoryPromoSessionClosed';
+            var modal = document.getElementById('theoryPromoModal');
+            if (!modal) return;
+            if (localStorage.getItem(lsKey) === '1' || sessionStorage.getItem(ssKey) === '1') return;
+            modal.removeAttribute('hidden');
+            function closeModal() {
+                modal.setAttribute('hidden', '');
+            }
+            var later = document.getElementById('theoryPromoLater');
+            var closeBtn = document.getElementById('theoryPromoClose');
+            var never = document.getElementById('theoryPromoNever');
+            var open = document.getElementById('theoryPromoOpen');
+            function dismissSession() {
+                sessionStorage.setItem(ssKey, '1');
+                closeModal();
+            }
+            if (later) {
+                later.addEventListener('click', dismissSession);
+            }
+            if (closeBtn) {
+                closeBtn.addEventListener('click', dismissSession);
+            }
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) dismissSession();
+            });
+            if (never) {
+                never.addEventListener('click', function() {
+                    localStorage.setItem(lsKey, '1');
+                    closeModal();
+                });
+            }
+            if (open) {
+                open.addEventListener('click', function() {
+                    localStorage.setItem(lsKey, '1');
+                });
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             dfaUi.engine = new RegexEngine();
             dfaUi.visualizer = new Visualizer('dfaCanvas');
             window.equivViz1 = new Visualizer('equivCanvas1');
             window.equivViz2 = new Visualizer('equivCanvas2');
+
+            initTheoryPromo();
 
             initAppTabs();
 
