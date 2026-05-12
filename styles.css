@@ -146,6 +146,7 @@
         }
         .regex-input {
             flex: 1;
+            min-width: 0;
             background: rgba(0, 0, 0, 0.3);
             border: 2px solid rgba(0, 212, 255, 0.3);
             border-radius: 10px;
@@ -515,6 +516,7 @@
         .equiv-input {
             background: var(--bg-elev-1);
             color: #f8fafc;
+            min-width: 0;
         }
 
         .regex-input {
@@ -961,4 +963,169 @@
         .theory-promo-quiet:hover {
             color: #94a3b8;
             text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: max(12px, env(safe-area-inset-top, 0px))
+                    max(12px, env(safe-area-inset-right, 0px))
+                    max(12px, env(safe-area-inset-bottom, 0px))
+                    max(12px, env(safe-area-inset-left, 0px));
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            .main-grid {
+                gap: 14px;
+            }
+
+            .hero h1 {
+                font-size: clamp(1.25rem, 5.5vw, 1.85rem);
+                padding: 0.38em 0.75em;
+            }
+
+            .subtitle {
+                font-size: 0.88rem;
+                margin-bottom: 20px;
+            }
+
+            .theory-hero-link {
+                margin-bottom: 18px;
+            }
+
+            .panel {
+                padding: 14px;
+            }
+
+            .regex-input-wrapper {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .regex-input-wrapper .regex-input {
+                grid-column: 1 / -1;
+                width: 100%;
+                font-size: 1rem;
+                padding: 12px 14px;
+            }
+
+            .regex-input-wrapper .generate-btn,
+            .regex-input-wrapper .clear-btn {
+                width: 100%;
+                min-height: 44px;
+                padding: 10px 12px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                box-sizing: border-box;
+            }
+
+            .regex-input-wrapper .generate-btn {
+                justify-self: stretch;
+            }
+
+            .settings-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .setting-group {
+                justify-content: space-between;
+                width: 100%;
+            }
+
+            .app-tabs {
+                flex-direction: column;
+            }
+
+            .app-tab {
+                min-width: 0;
+                width: 100%;
+                flex: none;
+                text-align: center;
+                font-size: 0.86rem;
+                padding: 11px 12px;
+            }
+
+            .viz-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .viz-toolbar .generate-btn,
+            .viz-toolbar .check-equiv-btn {
+                width: 100%;
+                min-height: 44px;
+                box-sizing: border-box;
+            }
+
+            .viz-toolbar input[type="range"] {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .viz-toolbar-label {
+                margin-top: 4px;
+            }
+
+            .center-row .check-equiv-btn {
+                width: 100%;
+                max-width: 100%;
+                min-height: 44px;
+                box-sizing: border-box;
+            }
+
+            .equiv-inputs {
+                justify-items: stretch;
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .vs-badge {
+                justify-self: center;
+                margin: 4px 0;
+            }
+
+            .equiv-result {
+                font-size: 0.95rem;
+                padding: 12px;
+            }
+
+            .equiv-dual-wrap {
+                gap: 14px;
+            }
+
+            .equiv-canvas-card {
+                flex: 1 1 100%;
+                max-width: 100%;
+            }
+
+            .placeholder-block {
+                padding: 24px 14px;
+            }
+
+            .info-box {
+                font-size: 0.82rem;
+            }
+
+            .hero-author {
+                font-size: 0.82rem;
+                padding: 0 4px;
+            }
+
+            .theory-promo-overlay {
+                padding: max(16px, env(safe-area-inset-top, 0px)) 16px 16px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .regex-input-wrapper .generate-btn,
+            .regex-input-wrapper .clear-btn {
+                font-size: 0.82rem;
+                padding: 10px 8px;
+            }
         }
